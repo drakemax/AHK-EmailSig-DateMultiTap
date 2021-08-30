@@ -311,7 +311,45 @@ return
 	}
 return
 
-;-------------------------------------------------
-;------------END LOGIN MY WEBSITES-----------------
+; This can also be done by 
+; #v:: ; Text–only paste from ClipBoard
+; 	Clip0 = %ClipBoardAll%
+; 	ClipBoard = %ClipBoard% ; Convert to text
+; 	Send ^v ; For best compatibility: SendPlay
+; 	Sleep 50 ; Don't change clipboard while it is pasted! 
+
+; 	(Sleep > 0)
+; 	ClipBoard = %Clip0% ; Restore original ClipBoard
+; 	VarSetCapacity(Clip0, 0) ; Free memory
+; Return
+
+; Yellow dot at cursor-https://www.youtube.com/watch?v=hdoA8pH3yy4&list=PLa9z1lCs1x9JEEFS9vArkbg0p8D8hbArr&index=11
+; Ripple Effect-https://www.youtube.com/watch?v=c4zr56knBDI&list=PLa9z1lCs1x9JEEFS9vArkbg0p8D8hbArr&index=12
+; Onscreen display of keystrokes-https://www.youtube.com/watch?v=c4zr56knBDI&list=PLa9z1lCs1x9JEEFS9vArkbg0p8D8hbArr&index=12
+
+;----------Yellow dot at cursor-----------------
+SetWinDelay, -1
+CoordMode, Mouse, Screen
+
+^#w::
+	CircleSize := 90
+	Gui, -Caption +Hwndhwnd +AlwaysOnTop +ToolWindow +E0x20 ;+E0x20 click thru
+	;Gui, Color, cFFFF00 ;hex code yellow
+	Gui, Color, cFFA500 ;hex code orange
+	Gui, Show, x0 y-%CircleSize% w%CircleSize% h%CircleSize% NA, ahk_id %hwnd%
+	WinSet, Transparent, 60, ahk_id %hwnd%
+	WinSet, Region, 0-0 w%CircleSize% h%CircleSize% E, ahk_id %hwnd%
+	SetTimer, Circle, 10
+return
+
+Circle:
+	MouseGetPos, X, Y
+	X -= CircleSize / 2 - 3
+	Y -= CircleSize / 2 - 2
+	WinMove, ahk_id %hwnd%, , %X%, %Y%
+	WinSet, AlwaysOnTop, On, ahk_id %hwnd%
+return
+
+^#e::Reload ; Reload script with Ctrl+Win+e
 
 ^Esc::ExitApp
