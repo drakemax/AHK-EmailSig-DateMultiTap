@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 #AHK-EmailSig-DateMultiTap
 his is a AHK script that Uses:
+=======
+# AHK-EmailSig-DateMultiTap
+This is a AHK script that Uses:
+>>>>>>> ba8275587f1a6bcfc890eac7be8d24a784c1cf42
 Ctrl + 1 to show different email signatures based on the number of taps
 Ctrl + 2 to show today's date in different formats depending on number of time you tap the keys
 It utilises TapHoldManager class by evilC - https://github.com/evilC/TapHoldManager

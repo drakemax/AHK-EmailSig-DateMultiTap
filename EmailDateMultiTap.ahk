@@ -14,15 +14,29 @@
 ;SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 
+#InstallMouseHook ; 
+
 #SingleInstance force
 
 #include C:\Users\%A_UserName%\Documents\AutoHotkey\Lib
 #include <TapHoldManager> ; The script will not work without this library!!!
 
-;-----------------------Global  Variables -----------------------------
+;-----------------------GLOBAL VARIABLES -----------------------------
+;-----------------------Recent Files Macro Global  Variables --------------
 PauseTime := 6000 ; used for website login pause
 ; MsgBox, %pausetime%
-
+;-----------------------Recent Files Macro Global  Variables -----------------------------
+; FileList is for Recent Files Macro storing file 
+FileList= C:\Users\drake\Downloads\AHK-Working\FileRecent\RecentFiles.csv
+; FileListOut is temp file for Recent Files Macro storing file , copies data less selected linme to delelte
+;and then deletes original file and names this original file (filelist)
+FileListOut= C:\Users\drake\Downloads\AHK-Working\FileRecent\RecentFilesOut.csv
+; StartFolderX is for Recent Files Macro starting folder for looking for files/foilders to select
+StartFolderX=C:\Users\drake\Downloads
+; IniFile is for Recent Files Macro countx for file in list number (used to delete a line)
+IniFile=C:\Users\drake\Downloads\AHK-Working\FileRecent\RecentFilesCount.ini
+FileListOut= C:\Users\drake\Downloads\AHK-Working\FileRecent\RecentFilesOut.csv
+;-----------------------Global  Variables -----------------------------
 thm := new TapHoldManager() ; Initialization of the THM (TapHoldManager)
 
 thm.Add("^1", Func("Func1")) ; Assigning a script to a "Ctrl+ 1"  key through a "Callback Function"
@@ -89,7 +103,7 @@ Func2(isHold, taps, state){
 
 	}
 	if (isHold=0) & (taps=3) & (state){
-		FormatTime, LongDateTime,,dddd, MMMM d, yyyy
+		FormatTime, LongDateTime,,dddd d MMMM yyyy
 		SendInput, %LongDateTime% `n ; current date formats long format
 
 		Return
@@ -111,7 +125,7 @@ return
 ;found the id of the microphone at "6" 
 ;https://www.autohotkey.com/boards/viewtopic.php?t=15509
 
->!4:: ;RAlt+4
+>!4:: ;RAlt+4- master mute
 
 	SoundSet, +1, MASTER, mute, 6 ;12 was my mic id number use the code below the dotted line to find your mic id. you need to replace all 12's  <---------IMPORTANT
 	SoundGet, master_mute, , mute, 6
@@ -123,33 +137,32 @@ RemoveToolTip:
 	SetTimer, RemoveToolTip, Off
 	ToolTip
 return
->!5::
+>!5:: ; mute the microphone
 	SoundSet 1, Microphone, mute ; mute the microphone
 	ToolTip, mute the microphone
 	SetTimer, RemoveToolTip, 1000
 return
->!6::
-	SoundSet 100, Microphone, mute ; mute the microphone
+>!6:: ;microphone FULL ON
+	SoundSet 100, Microphone, mute 
 	ToolTip, microphone 100 level
 	SetTimer, RemoveToolTip, 1000
 return
->!7::
+>!7:: ;sound down
 	SoundSet -10 
 	ToolTip, Sound Down -10
 	SetTimer, RemoveToolTip, 1000
 return
->!8::
+>!8:: ;sound up
 	SoundSet +10
 	ToolTip, Sound Up +10
 	SetTimer, RemoveToolTip, 1000
 return
->!9::
+>!9:: ;sound full
 	SoundSet, 100
 	ToolTip, Sound set to 100 RAlt0 to mute
 	SetTimer, RemoveToolTip, 1000
 return
->!0::	
-
+>!0::	;mute speakers 
 	SoundSet, 1 ; mute the microphone
 	ToolTip, Mute speakers RAlt9 to unmute
 	SetTimer, RemoveToolTip, 1000
@@ -323,11 +336,11 @@ return
 ; 	VarSetCapacity(Clip0, 0) ; Free memory
 ; Return
 
+;----------Yellow dot at cursor-----------------
 ; Yellow dot at cursor-https://www.youtube.com/watch?v=hdoA8pH3yy4&list=PLa9z1lCs1x9JEEFS9vArkbg0p8D8hbArr&index=11
 ; Ripple Effect-https://www.youtube.com/watch?v=c4zr56knBDI&list=PLa9z1lCs1x9JEEFS9vArkbg0p8D8hbArr&index=12
 ; Onscreen display of keystrokes-https://www.youtube.com/watch?v=c4zr56knBDI&list=PLa9z1lCs1x9JEEFS9vArkbg0p8D8hbArr&index=12
 
-;----------Yellow dot at cursor-----------------
 SetWinDelay, -1
 CoordMode, Mouse, Screen
 
@@ -350,6 +363,323 @@ Circle:
 	WinSet, AlwaysOnTop, On, ahk_id %hwnd%
 return
 
+; Ctrl------goes to beginning of line or end of line in text doc------
+;Ctrl---------Goes to top or bottom in Explorer directory----------
+^LButton::SendInput, {Home} ;Home Ctrl+ Left Mouse Button Home 
+^!j::SendInput, {Home}
+^RButton::SendInput, {End} ;End Ctrl+ Right Mouse Button Home 
+^!l::SendInput, {End}
+
+; Alt------goes down one line or up one line in text doc------
+!LButton::SendInput, {Up} ;Home shift+ Left Mouse Button Home 
+^!i::SendInput, {Up}
+
+!RButton::SendInput, {Down} ;End shift+ Right Mouse Button Home 
+^!m::SendInput, {Down} ;End shift+ Right Mouse Button Home
+
+; ------Shift + L/R Button - backspace (start at end of line, or Delete, start at beginning of line------
++LButton:: ; Capslock, followed by L button on mouse   Backspace Key
+	{
+		ButtonsHoldRepeat("Shift","LButton", "Backspace") ;     ButtonsHoldRepeat("CapsLock","LButton", "Backspace")
+		Exit
+	}
+return
+^!u:: ; Capslock, followed by L button on mouse   Backspace Key
+	{
+		ButtonsHoldRepeat("RShift","u", "Backspace") ;     ButtonsHoldRepeat("CapsLock","LButton", "Backspace")
+		Exit
+	}
+return
++RButton:: ; Capslock, followed by L button on mouse   Delete Key
+	{
+		ButtonsHoldRepeat("Shift","RButton", "Delete") ; ButtonsHoldRepeat("CapsLock","RButton", "Backspace")
+		Exit
+	}
+return
+^!o:: ; CRShift, followed by o    Delete Key
+	{
+		ButtonsHoldRepeat("RShift","u", "Delete") ; ButtonsHoldRepeat("CapsLock","RButton", "Backspace")
+		Exit
+	}
+return
+
+ButtonsHoldRepeat(TriggerKey1, TriggerKey2, OutputKey)
+{
+	GetKeyState, %TriggerKey1%,P ;Retrieve the physical state (i.e. whether the user is physically holding it down). 
+	GetKeyState, %TriggerKey2%,P
+
+	; while GetKeyState, (TriggerKey1,"p") or GetKeyState(TriggerKey2,"p")    
+	;   { }
+	while GetKeyState(TriggerKey1,"p") and GetKeyState(TriggerKey2,"p") 
+	{
+		SendInput, {%OutputKey%}
+		sleep, 200 ; delay before repeated button presses
+		While GetKeyState(TriggerKey1,"p") and GetKeyState(TriggerKey2,"p")
+		{
+			SendInput, {%OutputKey%}
+			sleep, 30 ; how fast the output key pie_repeatLastFunction()			
+		}
+	}
+
+	KeyWait,Capslock,U
+	sleep 100
+	SetCapsLockState , Off
+
+return
+} 
+
++#f:: ; Copies a file to "U:\_____TEMP_SHARE" dir
+	StartingFolder= C:\Users\drake\Downloads\AHK-Working
+	dest := "U:\_____TEMP_SHARE"
+
+	; pop up to select a file
+	FileSelectFile, SelectedFile, 3, %StartingFolder%, TITLE: Open FILE
+
+	FileCopy, %SelectedFile%, %dest%, Overwrite
+
+	IfNotExist %dest%
+	msgbox dest didn't exist! (ErrorLevel is %ErrorLevel%)
+return
+
++#d:: ; copy folder to "U:\_____TEMP_SHARE" dir and names the same
+
+	StartingFolder= C:\Users\drake\Downloads\AHK-Working
+	; FileSelectFolder, SelectedFolder, %StartingFolder%, 3, TITLE: Open FOLDER
+	; msgbox %StartingFolder% ----- %SelectedFolder%
+	TargetFolder := "U:\_____TEMP_SHARE"
+
+	;FileCopyDir, %SelectedFolder%, %dest%, Overwrite
+
+	FileSelectFolder, SourceFolder,%StartingFolder%, 3, Select the folder to copy
+	if SourceFolder =
+		return
+
+	;   MsgBox, 4, , A copy of the folder "%SourceFolder%" will be put into "%TargetFolder%". Continue?
+	;   IfMsgBox, No
+	; return
+	SplitPath, SourceFolder, SourceFolderName1 ; Extract only the folder name from its full path.
+	DT= %A_YYYY%-%A_MM%-%A_DD%
+	SourceFolderName=%SourceFolderName1%-%DT%-Main
+	FileCopyDir, %SourceFolder%, %TargetFolder%\%SourceFolderName%
+	if ErrorLevel
+		MsgBox The folder could not be copied, perhaps because a folder of that name already exists in "%TargetFolder%".
+return
+
+;_________----------__________---------RECENT FILES _______---------_________
+
+^#a:: ;select file
+	FileSelectFile, SelectedFile, 3, C:\Users\drake\Downloads, SELECT FILE TO SAVE ;, Text Documents (*.txt, *.ahk)
+
+	DT= %A_YYYY%-%A_MM%-%A_DD%
+
+	splitpath, SelectedFile, FileN
+	splitpath, SelectedFile, ,,OutExtension
+
+	IniRead, Countx, %IniFile%,Counter, counter1
+
+	Countx+=1
+	; boxes for input file desc and project code
+	InputBox, Desc , %SelectedFolder% , DESCRIPTION
+	InputBox, Proj , %SelectedFolder% , PROJECT
+	; concatenate file line number, date, and other file info
+	FileToSave =%Countx%, %DT%,,%OutExtension%,%Proj%,%Desc%,%SelectedFile%,%FileN%,`n
+	;This appends the information to main file.
+	FileAppend, %FileToSave%, %FileList%
+	;updates couter for file /folder number in list
+	IniWrite, %Countx%, %IniFile%, Counter, counter1
+Return
+;}
+^#q:: ;select folder
+	;Refer to above ^#a for comments 
+	FileSelectFolder, SelectedFolder,%StartFolderX%,,SELECT FOLDER TO SAVE 
+
+	InputBox, Desc , %SelectedFolder%, DESCRIPTION
+	InputBox, Proj , %SelectedFolder%, PROJECT 
+
+	IniRead, Countx, %IniFile%,Counter, counter1
+	Countx+=1
+	DT= %A_YYYY%-%A_MM%-%A_DD%
+
+	splitpath, SelectedFolder, FolderN
+	DummyExt=Dir
+
+	FileToSave =%Countx%, %DT%,,%DummyExt%,%Proj%,%Desc%,%SelectedFolder%,%FolderN%,`n
+	FileAppend, %FileToSave%, %FileList%
+	IniWrite, %Countx%, %IniFile%, Counter, counter1
+Return
+
+^#d::
+	; delete a line (create temp file, writeline to new less one selected, deletes old file and creates new 
+	;file of same name from temp file)
+	InputBox, LineNumDel , Which LINE NUMBER CODE to Delete ?
+	{
+
+		Loop, Read, %FileList%
+		{
+			LineNumber = %A_Index%
+			Loop, Parse, A_LoopReadLine, CSV
+			{
+				var%A_Index% := A_LoopField
+
+			}
+
+			x=%A_LoopReadLine%`n
+
+			IfNotEqual, var1 , %LineNumDel%
+			{
+				FileAppend, %x%, %FileListOut%
+			}
+
+		}
+	}
+	FileDelete, %FileList%
+	FileCopy, %FileListOut%, %FileList% , Overwrite
+	FileDelete, %FileListOut%
+return
+^#s:: ; This edits file (if you want to change project code or desc)
+	Run C:\Program Files (x86)\Notepad++\notepad++.exe "%FileList%"
+return
+
 ^#e::Reload ; Reload script with Ctrl+Win+e
 
 ^Esc::ExitApp
+
+/*
+MultiPaste.ahk by Jack Dunning June 20, 2019   Updated July 5, 2019
+
+Many Windows users will find this AutoHotkey script handy for copying data-sets and breaking
+them up into its component parts for pasting into form fields. You can use the app to copy and 
+parse portions of Web tables, groups of cells in a spreadsheet, single-line street addresses, 
+and many other pieces of data then insert those items into individual fields in another window. 
+
+After selecting a section of a page (left-click, hold, and drag), activate the Hotkey combination 
+CTRL+ALT+F to open a MsgBox window displaying the parsed information in its components. 
+The MsgBox stays always-on-top while you move to your input screen.
+
+Next, select the target input field and press the Hotkey combination CTR:+ALT+WIN+W to activate
+the Input command. You have five seconds to press one of the number keys (0-9). AutoHotkey inserts 
+the text next to the pressed number key in the MsgBox into the selected field.
+
+This script parses text in the Windows Clipboard based upon the tab `t character, new lines, commas in 
+single-line addresses, plus US and UK postal codes, for placement in the variable array listed in the 
+MsgBox. This script works in a wide variety of situations although Web formatting may limit its usefulness.
+
+The script uses Regular Expressions in a number of places to recognize dates and postal codes. Script discussion
+begins with the blog:
+
+https://jacksautohotkeyblog.wordpress.com/brute-force-data-set-copy-and-paste-autohotkey-clipboard-technique/
+
+July 5, 2019 Replaced tab removal loop with a single-line RegExReplace() function and corrected date
+identifying conditional.
+
+July 27, 2019 Changed date RegEx to include dates separated by dashes and dots, as well as, forward slashes.
+
+September 9, 2019 Added conditional Hotkeys Alt+1 throught Alt+0 for pasting items. Only active with
+MsgBox titled "Multi Paste" open.
+
+Per suggestion, Clipboard contents transferred to variable (ClipboardCopy) before manipulation.
+
+October 1, 2020 Hotkeys changed to $ plus digit (0-9). This makes single key Hotkeys. The $ prevents 
+internal re-firing of digits with SendInput command.
+*/
+
++!F:: ; SHFT+ALT+F to select text 
+	OldClipboard := ClipboardAll
+	Clipboard = ;clears the Clipboard
+	SendInput, ^c
+	ClipWait 0 ; pause for Clipboard data
+	If ErrorLevel
+	{
+		MsgBox, Error message for non-selection
+		}
+
+	ClipboardCopy := Clipboard
+	; Replace all new paragraph marks with tabs for parsing
+	ClipboardCopy := StrReplace(ClipboardCopy, "`r`n" , "`t")
+	; Just in case the data-set includes a stray `r or`n 
+	ClipboardCopy := StrReplace(ClipboardCopy, "`r" , "`t") 
+	ClipboardCopy := StrReplace(ClipboardCopy, "`n" , "`t") 
+
+	; For single-line addresses replace commas
+	ClipboardCopy := StrReplace(ClipboardCopy, "`, " , "`t")
+
+	;  To parse US zip codes
+	ClipboardCopy := RegExReplace(ClipboardCopy, "\s(\d\d\d\d\d)", "`t$1")
+
+	;  To parse UK postal codes
+	ClipboardCopy := RegExReplace(ClipboardCopy, "\s([A-Za-z][A-Za-z]?\d\w?)", "`t$1")
+
+	; Designed to removes excess tabs, replaced this loop with the one-line RegEx
+	; which follows. Loop doesn't work if a space appears between tabs the 
+	; RegEx does.
+
+	;  Loop 
+	;  {
+	;   ClipboardCopy := StrReplace(ClipboardCopy, "`t`t" , "`t")
+	;    If ! InStr(Clipboard, "`t`t")
+	;      Break
+	;  }
+
+	ClipboardCopy := RegExReplace(ClipboardCopy, "`t\s*`t" , "`t")
+
+	; Sparse data-set
+	Transaction := StrSplit(ClipboardCopy , "`t", , MaxParts := -1) ; [v1.1.28} 
+
+	; Display MsgBox always-on-top (4096) for pasting into target fields 
+	; Word-wrapped using line continuation techniques
+	MsgBox, 4096,Multi Paste , % "[1] " . Transaction[1] . "`r" 
+	. "[2] " . Transaction[2] . "`r" 
+	. "[3] " . Transaction[3] . "`r" 
+	. "[4] " . Transaction[4] . "`r" 
+	. "[5] " . Transaction[5] . "`r" 
+	. "[6] " . Transaction[6] . "`r" 
+	. "[7] " . Transaction[7] . "`r" 
+	. "[8] " . Transaction[8] . "`r" 
+	. "[9] " . Transaction[9] . "`r" 
+	. "[0] " . Transaction[10]
+	Clipboard := OldClipboard
+Return
+
++!d:: ;shft+Alt+d  enact after the selection then choose number on its own for paste
+	Input, SingleKey, L2 T5, ,1,2,3,4,5,6,7,8,9,0
+	; Special action for date fields
+	If SingleKey = 0
+		SingleKey := 10
+
+	; Check for date format to parse
+	If (Transaction[SingleKey] ~= "\d\d?[/\-.]\d\d?[/\-.]\d\d(\d\d)?")
+	{
+		If InStr(Transaction[SingleKey],"/")
+			date := StrSplit(Transaction[SingleKey],"/")
+		If InStr(Transaction[SingleKey],"-")
+			date := StrSplit(Transaction[SingleKey],"-")
+		If InStr(Transaction[SingleKey],".")
+			date := StrSplit(Transaction[SingleKey],".")
+
+		SendInput, % date[1]
+		SendInput, /
+		SendInput, % date[2]
+		SendInput, /
+		SendInput, % date[3]
+
+		; msgbox, % date[1] date[2] date[3]
+		; For date field tabbing use the following:
+		; SendInput, % date[1] . "`t" . date[2] . "`t" . date[3]
+	}
+	Else If SingleKey != ""
+		SendInput, % Transaction[SingleKey]
+Return
+
+#If WinExist("Multi Paste")
+	$1::SendInput, % Transaction[1]
+$2::SendInput, % Transaction[2]
+$3::SendInput, % Transaction[3]
+$4::SendInput, % Transaction[4]
+$5::SendInput, % Transaction[5]
+$6::SendInput, % Transaction[6]
+$7::SendInput, % Transaction[7]
+$8::SendInput, % Transaction[8]
+$9::SendInput, % Transaction[9]
+$0::SendInput, % Transaction[10]
+#If
+
